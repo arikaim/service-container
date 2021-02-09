@@ -15,6 +15,13 @@ namespace Arikaim\Core\Service;
 interface ServiceInterface 
 {  
     /**
+     * Get include service list 
+     *   
+     * @return array|null
+     */
+    public function getIncludeServices(): ?array;
+
+    /**
      * Get service name
      *
      * @return string

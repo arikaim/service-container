@@ -9,94 +9,62 @@
  */
 namespace Arikaim\Core\Service;
 
+use Psr\Container\ContainerInterface;
+
 use Arikaim\Core\Service\ServiceInterface;
+use Arikaim\Core\Service\Traits\ServiceTrait;
 
 /**
  *  Service base class
  */
 class Service implements ServiceInterface
 {    
-    /**
-     * Service name
-     *
-     * @var string
-     */
-    protected $serviceName;
+    use ServiceTrait;
 
     /**
-     * Service title
+     * Included services
      *
-     * @var string|null
+     * @var ContainerInterface|null
      */
-    protected $serviceTitle;
+    protected $container = null;
 
     /**
-     * Service description
-     *
-     * @var string|null
+     * Constructor
+     * 
+     * @param ContainerInterface|null $container 
      */
-    protected $serviceDescription;
-
-    /**
-     * Get service name
-     *
-     * @return string
-     */
-    public function getServiceName(): string
+    public function __construct(?ContainerInterface $container = null)
     {
-        return $this->serviceName;
+        $this->container = $container;
     }
 
     /**
-     * Set service name
+     * Get service instance
      *
      * @param string $name
-     * @return void
+     * @return mixed|null
      */
-    public function setServiceName(string $name): void
-    {
-        $this->serviceName = $name;
+    public function getService(string $name)
+    { 
+        if (\is_null($this->container) == true) {
+            return null;
+        }
+
+        return $this->container->get($name);
     }
 
     /**
-     * Get service title
+     * Check for service
      *
-     * @return string|null
+     * @param string $name
+     * @return bool
      */
-    public function getServiceTitle(): ?string
-    {
-        return $this->serviceTitle;
-    }
+    public function hasService(string $name): bool
+    { 
+        if (\is_null($this->container) == true) {
+            return null;
+        }
 
-    /**
-     * Set service title
-     *
-     * @param string $title
-     * @return void
-     */
-    public function setServiceTitle(string $title): void
-    {
-        $this->serviceTitle = $title;
-    }
-
-    /**
-     * Get service description
-     *
-     * @return string|null
-     */
-    public function getServiceDescription(): ?string
-    {
-        return $this->serviceDescription;
-    }
-
-    /**
-     * Set service description
-     *
-     * @param string $description
-     * @return void
-     */
-    public function setServiceDescription(string $description): void
-    {
-        $this->serviceDescription = $description;
+        return $this->container->has($name);
     }
 }

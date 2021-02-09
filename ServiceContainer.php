@@ -32,7 +32,7 @@ class ServiceContainer
     /**
      * Service container
      *
-     * @var ContainerInterface
+     * @var Container
     */
     protected $container;
 
@@ -92,9 +92,9 @@ class ServiceContainer
      * Get provider class
      *
      * @param string $name
-     * @return string|null
+     * @return array|null
      */
-    public function getProvider(string $name): ?string
+    public function getProvider(string $name): ?array
     {
         $this->load();
         return $this->serviceProviders[$name] ?? null;
@@ -122,21 +122,48 @@ class ServiceContainer
      */
     public function get(string $name)
     {             
-        // check prividers
-        $provider = $this->getProvider($name);
-        if (empty($provider) == true) {
-            return null;
-        }
-
         // check container
         if ($this->container->has($name) == false) {
-            // add in container
-            $this->container[$name] = function() use($provider) {
-                return new $provider();
-            };
+            $this->bindProvider($name);
         }
 
         return $this->container->get($name);
+    }
+
+    protected function bindProvider(string $name, ?array $provider = null): bool
+    { 
+        if (\is_null($provider) == true) {
+            // check prividers
+            $provider = $this->getProvider($name);
+            if (empty($provider) == true) {
+                return false;
+            }
+        }
+
+        // add in container
+        $includeServices = null;
+        if (\is_array($provider['include']) == true) {
+            $this->bindProviders($provider['include']);
+            $includeServices = $this->container->clone($provider['include']);
+        }
+        $this->container[$name] = function() use($provider,$includeServices) {
+            return new $provider['handler']($includeServices);
+        };   
+
+        return true;
+    }
+
+    /**
+     * Bind providers
+     *
+     * @param array $providersList
+     * @return void
+     */
+    protected function bindProviders(array $providersList)
+    {
+        foreach($providersList as $item) {
+            $this->bindProvider($item);
+        }
     }
 
     /**
@@ -153,25 +180,28 @@ class ServiceContainer
     /**
      * Register service provider
      *
-     * @param string $providerClass
+     * @param string|array $details
      * @return boolean
      */
-    public function register(string $providerClass): bool
+    public function register($details): bool
     {
-        if (\class_exists($providerClass) == false) {         
-            return false;
+        if (\is_string($details) == true) {
+            if (\class_exists($details) == false) {         
+                return false;
+            }
+            $provider = new $details();
+            if (($provider instanceof ServiceInterface) == false) {
+                throw new Exception('Service provider ' . $details . ' not valid service class.');
+                return false;
+            }
+            $details = $this->resolveServiceDetails($provider);
+        } else {
+            $details = $this->resolveServiceDetails($details);
         }
-    
-        $provider = new $providerClass();
-     
-        if (($provider instanceof ServiceInterface) == false) {
-            throw new Exception('Service provider ' . $providerClass . ' not valid service class.');
-            return false;
-        }
-        $serviceName = $provider->getServiceName();
+       
         $this->load(true);
 
-        $this->serviceProviders[$serviceName] = $providerClass;
+        $this->serviceProviders[$details['name']] = $details;
 
         return $this->saveConfigFile($this->configFileName,$this->serviceProviders);       
     }
@@ -195,5 +225,32 @@ class ServiceContainer
         unset($this->serviceProviders[$name]);
 
         return $this->saveConfigFile($this->configFileName,$this->serviceProviders);     
+    }
+
+    /**
+     * Resolve service edetails
+     *
+     * @param ServiceInterface|array $details
+     * @throws Exception
+     * @return array
+     */
+    protected function resolveServiceDetails($details): array
+    {
+        if ($details instanceof ServiceInterface) {
+            return [
+                'handler' => \get_class($details),
+                'name'    => $details->getServiceName(),
+                'title'   => $details->getServiceTitle(),
+                'include' => $details->getIncludeServices()
+            ];
+        }
+
+        if (isset($details['name']) == false || isset($details['handler'])) {
+            throw new Exception('Service name or handler not valid.');
+        }
+        $details['title'] = $details['title'] ?? null;
+        $details['include'] = $details['include'] ?? null;
+
+        return $details;
     }
 }
