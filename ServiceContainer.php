@@ -9,8 +9,6 @@
  */
 namespace Arikaim\Core\Service;
 
-use Psr\Container\ContainerInterface;
-
 use Arikaim\Container\Container;
 use Arikaim\Core\Utils\Path;
 use Arikaim\Core\System\Traits\PhpConfigFile;
@@ -130,6 +128,13 @@ class ServiceContainer
         return $this->container->get($name);
     }
 
+    /**
+     * Include service
+     *
+     * @param string $name
+     * @param array|null $provider
+     * @return boolean
+     */
     protected function bindProvider(string $name, ?array $provider = null): bool
     { 
         if (\is_null($provider) == true) {
@@ -159,7 +164,7 @@ class ServiceContainer
      * @param array $providersList
      * @return void
      */
-    protected function bindProviders(array $providersList)
+    protected function bindProviders(array $providersList): void
     {
         foreach($providersList as $item) {
             $this->bindProvider($item);
