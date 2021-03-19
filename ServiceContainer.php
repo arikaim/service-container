@@ -179,6 +179,10 @@ class ServiceContainer
      */
     public function has(string $name): bool
     {      
+        if ($this->container->has($name) == false) {
+            $this->bindProvider($name);
+        }
+
         return (bool)$this->container->has($name);
     }
 
