@@ -203,6 +203,10 @@ class ServiceContainer
             $details = $this->resolveServiceDetails($details);
         }
        
+        // load current array
+        $this->serviceProviders = $this->includePhpArray($this->configFileName);
+        
+        // add item
         $this->serviceProviders[$details['name']] = $details;
 
         return $this->saveConfigFile($this->configFileName,$this->serviceProviders);       
