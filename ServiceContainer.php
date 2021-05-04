@@ -60,18 +60,16 @@ class ServiceContainer
     }
 
     /**
-     * Load service eproviders
+     * Load service providers
      *
-     * @param boolean $forceReload
+     * @param boolean $reload
      * @return void
      */
-    public function load(bool $forceReload = false): void
+    public function load(bool $reload = false): void
     {
-        if ((\is_null($this->serviceProviders) == false) && ($forceReload == false)) {
-            return;
+        if ((\is_null($this->serviceProviders) == true) || ($reload == true)) {
+            $this->serviceProviders = $this->include($this->configFileName);
         }
-
-        $this->serviceProviders = $this->include($this->configFileName);
     }
 
     /**
@@ -95,6 +93,7 @@ class ServiceContainer
     public function getProvider(string $name): ?array
     {
         $this->load();
+
         return $this->serviceProviders[$name] ?? null;
     }
 
@@ -107,6 +106,7 @@ class ServiceContainer
     public function hasProvider(string $name): bool
     {
         $this->load();
+        
         $provider = $this->serviceProviders[$name] ?? null;
 
         return !empty($provider);
