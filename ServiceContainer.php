@@ -56,7 +56,8 @@ class ServiceContainer
     public function __construct(?string $configFileName = null)
     {
         $this->container = new Container();
-        $this->configFileName = $configFileName ?? Self::CONFIG_FILE_NAME;        
+        $this->configFileName = $configFileName ?? Self::CONFIG_FILE_NAME;   
+        $this->load();     
     }
 
     /**
@@ -79,8 +80,6 @@ class ServiceContainer
      */
     public function getProviders(): array
     {
-        $this->load();
-
         return $this->serviceProviders ?? [];
     }
 
@@ -92,8 +91,6 @@ class ServiceContainer
      */
     public function getProvider(string $name): ?array
     {
-        $this->load();
-
         return $this->serviceProviders[$name] ?? null;
     }
 
@@ -105,8 +102,6 @@ class ServiceContainer
      */
     public function hasProvider(string $name): bool
     {
-        $this->load();
-        
         $provider = $this->serviceProviders[$name] ?? null;
 
         return !empty($provider);
@@ -208,8 +203,6 @@ class ServiceContainer
             $details = $this->resolveServiceDetails($details);
         }
        
-        $this->load(true);
-
         $this->serviceProviders[$details['name']] = $details;
 
         return $this->saveConfigFile($this->configFileName,$this->serviceProviders);       
