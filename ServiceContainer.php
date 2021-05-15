@@ -14,6 +14,7 @@ use Arikaim\Core\Utils\Path;
 use Arikaim\Core\System\Traits\PhpConfigFile;
 use Arikaim\Core\Service\ServiceInterface;
 use Exception;
+use Closure;
 
 /**
  *  Service container
@@ -180,6 +181,23 @@ class ServiceContainer
 
         return (bool)$this->container->has($name);
     }
+
+    /**
+     * Run closure with serice
+     *
+     * @param string $name
+     * @param Closure $callback
+     * @return mixed
+     */
+    public function with(string $name, Closure $callback)
+    {
+        if ($this->has($name) == false) {
+            return false;
+        }
+        $service = $this->get($name);
+
+        return $callback($service);
+    } 
 
     /**
      * Register service provider
