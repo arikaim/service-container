@@ -46,11 +46,7 @@ class Service implements ServiceInterface
      */
     public function getService(string $name)
     { 
-        if (\is_null($this->container) == true) {
-            return null;
-        }
-
-        return $this->container->get($name);
+        return ($this->container === null) ? null : $this->container->get($name);       
     }
 
     /**
@@ -61,10 +57,6 @@ class Service implements ServiceInterface
      */
     public function hasService(string $name): bool
     { 
-        if (\is_null($this->container) == true) {
-            return null;
-        }
-
-        return $this->container->has($name);
+        return ($this->container === null) ? false : $this->container->has($name);          
     }
 }
