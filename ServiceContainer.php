@@ -69,7 +69,7 @@ class ServiceContainer
      */
     public function load(bool $reload = false): void
     {
-        if ((\is_null($this->serviceProviders) == true) || ($reload == true)) {
+        if (($this->serviceProviders === null) || ($reload == true)) {
             $this->serviceProviders = $this->include($this->configFileName);
         }
     }
@@ -133,7 +133,7 @@ class ServiceContainer
      */
     protected function bindProvider(string $name, ?array $provider = null): bool
     { 
-        if (\is_null($provider) == true) {
+        if ($provider === null) {
             // check prividers
             $provider = $this->getProvider($name);
             if (empty($provider) == true) {
