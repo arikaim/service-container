@@ -216,8 +216,9 @@ class ServiceContainer
                 throw new Exception('Service provider ' . $details . ' not valid service class.');
                 return false;
             }
+            $provider->boot();
             $details = $this->resolveServiceDetails($provider);
-        } else {
+        } else {          
             $details = $this->resolveServiceDetails($details);
         }
        
