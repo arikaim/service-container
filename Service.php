@@ -36,6 +36,14 @@ class Service implements ServiceInterface
     public function __construct(?ContainerInterface $container = null)
     {
         $this->container = $container;
+        $this->boot();
+    }
+
+    /**
+     *  Boot service
+     */
+    public function boot()
+    {
     }
 
     /**
