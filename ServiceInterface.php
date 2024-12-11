@@ -15,6 +15,11 @@ namespace Arikaim\Core\Service;
 interface ServiceInterface 
 {  
     /**
+     *  Boot service
+     */
+    public function boot();
+
+    /**
      * Get include service list 
      *   
      * @return array|null

@@ -214,7 +214,6 @@ class ServiceContainer
             $provider = new $details();
             if (($provider instanceof ServiceInterface) == false) {
                 throw new Exception('Service provider ' . $details . ' not valid service class.');
-                return false;
             }
             $provider->boot();
             $details = $this->resolveServiceDetails($provider);
